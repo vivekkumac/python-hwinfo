@@ -340,7 +340,7 @@ def tabulate_cpu_recs(recs):
     return tabulate_recs(recs, header)
 
 def create_unit(title, content):
-    return "\n%s\n\n%s\n" % (title, content)
+    return "\n%s\n\n%s\n" % (str(title), str(content))
 
 def validate_args(args):
     if args.machine != 'localhost':

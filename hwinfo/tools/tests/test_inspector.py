@@ -5,6 +5,21 @@ from mock import patch
 from StringIO import StringIO
 
 from hwinfo.tools import inspector
+import dummy_data
+
+class HostMock(inspector.Host):
+
+    def get_lspci_data(self):
+        return dummy_data.LSPCI_DUMMY
+
+    def get_dmidecode_data(self):
+        return dummy_data.DMIDECODE_DUMMY
+
+    def get_cpuinfo_data(self):
+        return dummy_data.CPUINFO_DUMMY
+
+    def get_os_data(self):
+        return dummy_data.OS_DUMMY
 
 class HostObjectTests(unittest.TestCase):
 
@@ -410,19 +425,16 @@ class CLITests(unittest.TestCase):
         inspector.main()
         host_cls.assert_called_with('ack-submission.tar.gz')
 
-class PrintSystemInfoTests(unittest.TestCase):
+class SystemInfoTests(unittest.TestCase):
 
-    @patch('hwinfo.tools.inspector.create_unit')
-    def test_print_all(self, mcreate_unit):
-        mhost = mock.MagicMock()
+    def test_print_all(self):
+        mhost =  HostMock()
         options = ['bios', 'nic', 'storage', 'gpu', 'cpu']
-        inspector.system_info(mhost, options)
-        # GPU is optionally shown only if devices exist
-        self.assertEqual(len(mcreate_unit.mock_calls), 4)
+        out = inspector.system_info(mhost, options)
+        self.assertEqual(len(out.split(" Info:\n\n")), 6)
 
-    @patch('hwinfo.tools.inspector.create_unit')
-    def test_print_bios(self, mcreate_unit):
-        mhost = mock.MagicMock()
+    def test_print_bios(self):
+        mhost =  HostMock()
         options = ['bios']
-        inspector.system_info(mhost, options)
-        self.assertEqual(len(mcreate_unit.mock_calls), 1)
+        out = inspector.system_info(mhost, options)
+        self.assertEqual(len(out.split(" Info:\n\n")), 2)
